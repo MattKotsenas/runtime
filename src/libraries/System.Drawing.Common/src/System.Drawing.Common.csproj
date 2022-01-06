@@ -386,7 +386,6 @@ Unix support is disabled by default. See https://aka.ms/systemdrawingnonwindows 
     <Compile Include="System\Drawing\Drawing2D\GraphicsPath.Unix.cs" />
     <Compile Include="System\Drawing\Text\PrivateFontCollection.Unix.cs" />
     <Compile Include="System\Drawing\LibraryResolver.cs" />
-    <Compile Include="Interop\Unix\Interop.Libraries.cs" />
     <EmbeddedResource Include="Resources\System\Drawing\Error.ico">
       <LogicalName>placeholder.ico</LogicalName>
     </EmbeddedResource>
