@@ -133,6 +133,55 @@ namespace Microsoft.Extensions.Configuration
         }
 
         /// <summary>
+        /// Extracts the value with the specified key and converts it to <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type to convert the value to.</typeparam>
+        /// <param name="configuration">The configuration.</param>
+        /// <param name="key">The key of the configuration section's value to convert.</param>
+        /// <returns>The converted value.</returns>
+        /// <remarks>
+        /// Throws an exception if the specified key cannot be found or cannot be converted to <typeparamref name="T"/>.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// There is no configuration value with the key <paramref name="key"/> or it cannot be converted to type <typeparamref name="T"/>.
+        /// </exception>
+        [RequiresUnreferencedCode(TrimmingWarningMessage)]
+        public static T GetRequiredValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(this IConfiguration configuration, string key)
+        {
+            ThrowHelper.ThrowIfNull(configuration);
+
+            return (T)configuration.GetRequiredValue(typeof(T?), key);
+        }
+
+        /// <summary>
+        /// Extracts the value with the specified key and converts it to <paramref name="type"/>.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <param name="type">The type to convert the value to.</param>
+        /// <param name="key">The key of the configuration section's value to convert.</param>
+        /// <returns>The converted value.</returns>
+        /// <remarks>
+        /// Throws an exception if the specified key cannot be found, or cannot be converted to <paramref name="type"/>.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// There is no configuration value with the key <paramref name="key"/>, or it cannot be converted to type <paramref name="type"/>.
+        /// </exception>
+        [RequiresUnreferencedCode(TrimmingWarningMessage)]
+        public static object GetRequiredValue(this IConfiguration configuration, Type type, string key)
+        {
+            ThrowHelper.ThrowIfNull(configuration);
+
+            object? value = configuration.GetValue(type, key);
+
+            if (value is null)
+            {
+                throw new InvalidOperationException($"Unable to find required configuration key '{key}'.");
+            }
+
+            return value;
+        }
+
+        /// <summary>
         /// Extracts the value with the specified key and converts it to type T.
         /// </summary>
         /// <typeparam name="T">The type to convert the value to.</typeparam>
