@@ -167,7 +167,7 @@ namespace Microsoft.Extensions.Configuration
         /// There is no configuration value with the key <paramref name="key"/>, or it cannot be converted to type <paramref name="type"/>.
         /// </exception>
         [RequiresUnreferencedCode(TrimmingWarningMessage)]
-        public static object GetRequiredValue(this IConfiguration configuration, Type type, string key)
+        public static object GetRequiredValue(this IConfiguration configuration, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, string key)
         {
             ThrowHelper.ThrowIfNull(configuration);
 
@@ -175,7 +175,7 @@ namespace Microsoft.Extensions.Configuration
 
             if (value is null)
             {
-                throw new InvalidOperationException($"Unable to find required configuration key '{key}'.");
+                throw new InvalidOperationException(SR.Format(SR.Error_MissingRequired, key));
             }
 
             return value;

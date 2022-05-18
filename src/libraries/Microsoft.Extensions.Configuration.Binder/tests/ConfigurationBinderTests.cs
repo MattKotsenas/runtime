@@ -395,6 +395,17 @@ namespace Microsoft.Extensions.Configuration.Binder.Test
             Assert.Equal(0, config.GetValue<int>("Integer"));
             Assert.Equal(0, config.GetValue<int>("Nested:Integer"));
             Assert.Null(config.GetValue<ComplexOptions>("Object"));
+
+            InvalidOperationException ex;
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue<bool>("Boolean"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Boolean"), ex.Message);
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue<int>("Integer"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Integer"), ex.Message);
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue<int>("Nested:Integer"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Nested:Integer"), ex.Message);
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue<ComplexOptions>("Object"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Object"), ex.Message);
+
             Assert.False(config.GetSection("Boolean").Get<bool>());
             Assert.Equal(0, config.GetSection("Integer").Get<int>());
             Assert.Equal(0, config.GetSection("Nested:Integer").Get<int>());
@@ -451,7 +462,7 @@ namespace Microsoft.Extensions.Configuration.Binder.Test
         }
 
         [Fact]
-        public void GetDefaultsWhenDataDoesNotExist()
+        public void GetWhenDataDoesNotExist()
         {
             var dic = new Dictionary<string, string>
             {
@@ -460,15 +471,39 @@ namespace Microsoft.Extensions.Configuration.Binder.Test
             configurationBuilder.AddInMemoryCollection(dic);
             var config = configurationBuilder.Build();
 
+            // default(T)
             Assert.False(config.GetValue<bool>("Boolean"));
             Assert.Equal(0, config.GetValue<int>("Integer"));
             Assert.Equal(0, config.GetValue<int>("Nested:Integer"));
             Assert.Null(config.GetValue<ComplexOptions>("Object"));
+
+            // default specified
             Assert.True(config.GetValue("Boolean", true));
             Assert.Equal(3, config.GetValue("Integer", 3));
             Assert.Equal(1, config.GetValue("Nested:Integer", 1));
             var foo = new ComplexOptions();
             Assert.Same(config.GetValue("Object", foo), foo);
+
+            // Required (generic)
+            InvalidOperationException ex;
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue<bool>("Boolean"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Boolean"), ex.Message);
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue<int>("Integer"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Integer"), ex.Message);
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue<int>("Nested:Integer"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Nested:Integer"), ex.Message);
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue<ComplexOptions>("Object"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Object"), ex.Message);
+
+            // Required (non-generic)
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue(typeof(bool), "Boolean"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Boolean"), ex.Message);
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue(typeof(int), "Integer"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Integer"), ex.Message);
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue(typeof(int), "Nested:Integer"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Nested:Integer"), ex.Message);
+            ex = Assert.Throws<InvalidOperationException>(() => config.GetRequiredValue(typeof(ComplexOptions), "Object"));
+            Assert.Equal(SR.Format(SR.Error_MissingRequired, "Object"), ex.Message);
         }
 
         [Fact]
